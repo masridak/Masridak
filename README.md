@@ -17,15 +17,24 @@ Here are some ideas to get you started:
 Penginstallan :
 
 $ cd $HOME
+
 $ pkg update && pkg upgrade -y
+
 $ pkg install bash curl wget jq
+
 $ pkg install python python-pip
+
 $ pkg install make clang
+
 $ pkg install git
+
 $ git clone https://github.com/Sxp-ID/spam-pairing
 $ cd spam-pairing
+
 $ git pull
+
 $ make install
+
 $ ./main
 
 Atau bisa juga run script nya dg ketik perintah
