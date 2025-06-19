@@ -1,5 +1,5 @@
-![Screenshot_2025-06-17-21-49-15-20_84d3000e3f4017145260f7618db1d683](https://github.com/user-attachments/assets/86d5aa31-2e96-4394-b4bf-2c30fc372ade)
-![Screenshot_2025-06-17-21-49-15-20_84d3000e3f4017145260f7618db1d683](https://github.com/user-attachments/assets/e24741a9-ffca-4f5c-9880-1177134e03c8)
+tampilan termux 
+!20_84d3000e3f4017145260f7618db1d683]
 ## Hi there 👋
 
 <!--
