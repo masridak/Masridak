@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Chat Link Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .whatsapp-bg {
+            background-color: #25D366;
+        }
+        .whatsapp-bg:hover {
+            background-color: #128C7E;
+        }
+        .whatsapp-text {
+            color: #25D366;
+        }
+        .error-input {
+            border-color: #EF4444;
+        }
+        #wa-button.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <header class="whatsapp-bg text-white py-6 shadow-md">
+        <div class="container mx-auto px-4 text-center">
+            <div class="flex justify-center mb-4">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/bc372c74-c90d-4e59-8c50-767ea3be0527.png" alt="WhatsApp chat starter logo" class="rounded-full bg-white p-2" />
+            </div>
+            <h1 class="text-2xl md:text-3xl font-bold">WhatsApp Chat Link Generator</h1>
+            <p class="mt-2 text-sm md:text-base">Buat tautan chat WhatsApp instan tanpa menyimpan kontak</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 flex-grow">
+        <div class="max-w-md mx-auto bg-white rounded-lg shadow-md overflow-hidden p-6">
+            <div class="mb-6">
+                <label for="phone-number" class="block text-gray-700 text-sm font-medium mb-2">Nomor WhatsApp Tujuan</label>
+                <div class="flex items-center border rounded-md overflow-hidden">
+                    <span class="px-3 py-2 bg-gray-100 text-gray-700 border-r">+62</span>
+                    <input 
+                        type="text" 
+                        id="phone-number" 
+                        placeholder="Contoh: 8123456789" 
+                        class="flex-grow px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200" 
+                        maxlength="15"
+                        pattern="[0-9]*"
+                        inputmode="numeric"
+                    />
+                </div>
+                <p class="mt-1 text-xs text-gray-500">Masukkan nomor tanpa tanda + atau 0 di depan</p>
+                <p id="error-message" class="hidden mt-2 text-sm text-red-600"></p>
+            </div>
+
+            <div class="mb-6">
+                <label for="message" class="block text-gray-700 text-sm font-medium mb-2">Pesan Awal (Opsional)</label>
+                <textarea 
+                    id="message" 
+                    rows="3" 
+                    placeholder="Halo, saya ingin bertanya..." 
+                    class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-200"
+                ></textarea>
+            </div>
+
+            <button 
+                id="wa-button" 
+                class="w-full whatsapp-bg text-white py-3 px-4 rounded-md font-medium flex items-center justify-center disabled"
+                disabled
+            >
+                <i class="fab fa-whatsapp text-xl mr-2"></i>
+                Buka Chat WhatsApp
+            </button>
+
+            <div class="mt-6 border-t pt-6">
+                <h3 class="text-gray-700 text-lg font-medium mb-3">Riwayat Nomor</h3>
+                <div id="history-list" class="space-y-2">
+                    <!-- History items will be added here by JavaScript -->
+                </div>
+                <button 
+                    id="clear-history" 
+                    class="mt-4 text-sm text-red-500 hover:text-red-700 focus:outline-none"
+                >
+                    Bersihkan Riwayat
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white py-4 border-t">
+        <div class="container mx-auto px-4 text-center text-gray-600 text-sm">
+            <p>© 2023 WhatsApp Chat Link Generator - Gunakan dengan bijak</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const phoneInput = document.getElementById('phone-number');
+            const messageInput = document.getElementById('message');
+            const waButton = document.getElementById('wa-button');
+            const errorMessage = document.getElementById('error-message');
+            const historyList = document.getElementById('history-list');
+            const clearHistoryBtn = document.getElementById('clear-history');
+
+            // Load saved phone numbers from localStorage
+            const savedNumbers = JSON.parse(localStorage.getItem('waNumbers')) || [];
+            
+            // Function to validate phone number
+            function validatePhoneNumber(phone) {
+                if (!phone) {
+                    return { isValid: false, message: 'Nomor HP tidak boleh kosong' };
+                }
+                
+                if (!/^\d+$/.test(phone)) {
+                    return { isValid: false, message: 'Hanya boleh berisi angka' };
+                }
+                
+                if (phone.length < 9 || phone.length > 15) {
+                    return { isValid: false, message: 'Panjang nomor harus antara 9-15 digit' };
+                }
+                
+                return { isValid: true };
+            }
+
+            // Function to update WA button state
+            function updateWaButton() {
+                const phone = phoneInput.value;
+                const validation = validatePhoneNumber(phone);
+                
+                if (validation.isValid) {
+                    waButton.classList.remove('disabled');
+                    waButton.disabled = false;
+                    phoneInput.classList.remove('error-input');
+                    errorMessage.classList.add('hidden');
+                } else {
+                    waButton.classList.add('disabled');
+                    waButton.disabled = true;
+                    
+                    if (phone && !validation.isValid) {
+                        phoneInput.classList.add('error-input');
+                        errorMessage.textContent = validation.message;
+                        errorMessage.classList.remove('hidden');
+                    } else {
+                        phoneInput.classList.remove('error-input');
+                        errorMessage.classList.add('hidden');
+                    }
+                }
+            }
+
+            // Function to open WhatsApp with number and message
+            function openWhatsApp() {
+                const phone = phoneInput.value;
+                const message = encodeURIComponent(messageInput.value);
+                const validation = validatePhoneNumber(phone);
+                
+                if (!validation.isValid) return;
+                
+                const url = `https://wa.me/62${phone}${message ? `?text=${message}` : ''}`;
+                window.open(url, '_blank');
+                
+                // Save to history if not already saved
+                if (!savedNumbers.includes(phone)) {
+                    savedNumbers.unshift(phone);
+                    if (savedNumbers.length > 5) savedNumbers.pop();
+                    localStorage.setItem('waNumbers', JSON.stringify(savedNumbers));
+                    renderHistory();
+                }
+            }
+
+            // Function to render history list
+            function renderHistory() {
+                historyList.innerHTML = '';
+                
+                savedNumbers.forEach(phone => {
+                    historyList.innerHTML += `
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-md">
+                            <span class="text-gray-700">+62 ${phone}</span>
+                            <button 
+                                data-phone="${phone}" 
+                                class="history-button text-sm whatsapp-text font-medium hover:underline focus:outline-none"
+                            >
+                                Gunakan
+                            </button>
+                        </div>
+                    `;
+                });
+                
+                // Add event listeners to history buttons
+                document.querySelectorAll('.history-button').forEach(button => {
+                    button.addEventListener('click', function() {
+                        phoneInput.value = this.getAttribute('data-phone');
+                        updateWaButton();
+                        phoneInput.focus();
+                    });
+                });
+            }
+
+            // Event listeners
+            phoneInput.addEventListener('input', function() {
+                // Allow only numbers
+                this.value = this.value.replace(/[^0-9]/g, '');
+                updateWaButton();
+            });
+            
+            waButton.addEventListener('click', openWhatsApp);
+            
+            clearHistoryBtn.addEventListener('click', function() {
+                localStorage.removeItem('waNumbers');
+                savedNumbers.length = 0;
+                renderHistory();
+            });
+            
+            // Initialize
+            updateWaButton();
+            renderHistory();
+        });
+    </script>
+</body>
+</html>
+
+  <!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Chat Link Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .whatsapp-bg {
+            background-color: #25D366;
+        }
+        .whatsapp-bg:hover {
+            background-color: #128C7E;
+        }
+        .whatsapp-text {
+            color: #25D366;
+        }
+        .error-input {
+            border-color: #EF4444;
+        }
+        #wa-button.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <header class="whatsapp-bg text-white py-6 shadow-md">
+        <div class="container mx-auto px-4 text-center">
+            <div class="flex justify-center mb-4">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/bc372c74-c90d-4e59-8c50-767ea3be0527.png" alt="WhatsApp chat starter logo" class="rounded-full bg-white p-2" />
+            </div>
+            <h1 class="text-2xl md:text-3xl font-bold">WhatsApp Chat Link Generator</h1>
+            <p class="mt-2 text-sm md:text-base">Buat tautan chat WhatsApp instan tanpa menyimpan kontak</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 flex-grow">
+        <div class="max-w-md mx-auto bg-white rounded-lg shadow-md overflow-hidden p-6">
+            <div class="mb-6">
+                <label for="phone-number" class="block text-gray-700 text-sm font-medium mb-2">Nomor WhatsApp Tujuan</label>
+                <div class="flex items-center border rounded-md overflow-hidden">
+                    <span class="px-3 py-2 bg-gray-100 text-gray-700 border-r">+62</span>
+                    <input 
+                        type="text" 
+                        id="phone-number" 
+                        placeholder="Contoh: 8123456789" 
+                        class="flex-grow px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200" 
+                        maxlength="15"
+                        pattern="[0-9]*"
+                        inputmode="numeric"
+                    />
+                </div>
+                <p class="mt-1 text-xs text-gray-500">Masukkan nomor tanpa tanda + atau 0 di depan</p>
+                <p id="error-message" class="hidden mt-2 text-sm text-red-600"></p>
+            </div>
+
+            <div class="mb-6">
+                <label for="message" class="block text-gray-700 text-sm font-medium mb-2">Pesan Awal (Opsional)</label>
+                <textarea 
+                    id="message" 
+                    rows="3" 
+                    placeholder="Halo, saya ingin bertanya..." 
+                    class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-200"
+                ></textarea>
+            </div>
+
+            <button 
+                id="wa-button" 
+                class="w-full whatsapp-bg text-white py-3 px-4 rounded-md font-medium flex items-center justify-center disabled"
+                disabled
+            >
+                <i class="fab fa-whatsapp text-xl mr-2"></i>
+                Buka Chat WhatsApp
+            </button>
+
+            <div class="mt-6 border-t pt-6">
+                <h3 class="text-gray-700 text-lg font-medium mb-3">Riwayat Nomor</h3>
+                <div id="history-list" class="space-y-2">
+                    <!-- History items will be added here by JavaScript -->
+                </div>
+                <button 
+                    id="clear-history" 
+                    class="mt-4 text-sm text-red-500 hover:text-red-700 focus:outline-none"
+                >
+                    Bersihkan Riwayat
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white py-4 border-t">
+        <div class="container mx-auto px-4 text-center text-gray-600 text-sm">
+            <p>© 2023 WhatsApp Chat Link Generator - Gunakan dengan bijak</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const phoneInput = document.getElementById('phone-number');
+            const messageInput = document.getElementById('message');
+            const waButton = document.getElementById('wa-button');
+            const errorMessage = document.getElementById('error-message');
+            const historyList = document.getElementById('history-list');
+            const clearHistoryBtn = document.getElementById('clear-history');
+
+            // Load saved phone numbers from localStorage
+            const savedNumbers = JSON.parse(localStorage.getItem('waNumbers')) || [];
+            
+            // Function to validate phone number
+            function validatePhoneNumber(phone) {
+                if (!phone) {
+                    return { isValid: false, message: 'Nomor HP tidak boleh kosong' };
+                }
+                
+                if (!/^\d+$/.test(phone)) {
+                    return { isValid: false, message: 'Hanya boleh berisi angka' };
+                }
+                
+                if (phone.length < 9 || phone.length > 15) {
+                    return { isValid: false, message: 'Panjang nomor harus antara 9-15 digit' };
+                }
+                
+                return { isValid: true };
+            }
+
+            // Function to update WA button state
+            function updateWaButton() {
+                const phone = phoneInput.value;
+                const validation = validatePhoneNumber(phone);
+                
+                if (validation.isValid) {
+                    waButton.classList.remove('disabled');
+                    waButton.disabled = false;
+                    phoneInput.classList.remove('error-input');
+                    errorMessage.classList.add('hidden');
+                } else {
+                    waButton.classList.add('disabled');
+                    waButton.disabled = true;
+                    
+                    if (phone && !validation.isValid) {
+                        phoneInput.classList.add('error-input');
+                        errorMessage.textContent = validation.message;
+                        errorMessage.classList.remove('hidden');
+                    } else {
+                        phoneInput.classList.remove('error-input');
+                        errorMessage.classList.add('hidden');
+                    }
+                }
+            }
+
+            // Function to open WhatsApp with number and message
+            function openWhatsApp() {
+                const phone = phoneInput.value;
+                const message = encodeURIComponent(messageInput.value);
+                const validation = validatePhoneNumber(phone);
+                
+                if (!validation.isValid) return;
+                
+                const url = `https://wa.me/62${phone}${message ? `?text=${message}` : ''}`;
+                window.open(url, '_blank');
+                
+                // Save to history if not already saved
+                if (!savedNumbers.includes(phone)) {
+                    savedNumbers.unshift(phone);
+                    if (savedNumbers.length > 5) savedNumbers.pop();
+                    localStorage.setItem('waNumbers', JSON.stringify(savedNumbers));
+                    renderHistory();
+                }
+            }
+
+            // Function to render history list
+            function renderHistory() {
+                historyList.innerHTML = '';
+                
+                savedNumbers.forEach(phone => {
+                    historyList.innerHTML += `
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-md">
+                            <span class="text-gray-700">+62 ${phone}</span>
+                            <button 
+                                data-phone="${phone}" 
+                                class="history-button text-sm whatsapp-text font-medium hover:underline focus:outline-none"
+                            >
+                                Gunakan
+                            </button>
+                        </div>
+                    `;
+                });
+                
+                // Add event listeners to history buttons
+                document.querySelectorAll('.history-button').forEach(button => {
+                    button.addEventListener('click', function() {
+                        phoneInput.value = this.getAttribute('data-phone');
+                        updateWaButton();
+                        phoneInput.focus();
+                    });
+                });
+            }
+
+            // Event listeners
+            phoneInput.addEventListener('input', function() {
+                // Allow only numbers
+                this.value = this.value.replace(/[^0-9]/g, '');
+                updateWaButton();
+            });
+            
+            waButton.addEventListener('click', openWhatsApp);
+            
+            clearHistoryBtn.addEventListener('click', function() {
+                localStorage.removeItem('waNumbers');
+                savedNumbers.length = 0;
+                renderHistory();
+            });
+            
+            // Initialize
+            updateWaButton();
+            renderHistory();
+        });
+    </script>
+</body>
+</html>
+
+          
