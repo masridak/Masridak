@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Love For Sakila</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            color: #5a1b24;
+        }
+        
+        .container {
+            text-align: center;
+            position: relative;
+            max-width: 1200px;
+            padding: 2rem;
+            margin: 0 auto;
+        }
+        
+        h1.name {
+            font-family: 'Great Vibes', cursive;
+            font-size: 6rem;
+            color: #701f2d;
+            margin: 1rem 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            position: relative;
+            display: inline-block;
+        }
+        
+        h1.name::before, h1.name::after {
+            content: '❤️';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 3rem;
+            animation: pulse 1.5s infinite alternate;
+        }
+        
+        h1.name::before {
+            left: -2.5rem;
+        }
+        
+        h1.name::after {
+            right: -2.5rem;
+        }
+        
+        @keyframes pulse {
+            from { transform: translateY(-50%) scale(1); }
+            to { transform: translateY(-50%) scale(1.2); }
+        }
+        
+        .subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+        
+        .love-box {
+            background-color: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin: 2rem 0;
+            transition: transform 0.3s ease;
+        }
+        
+        .love-box:hover {
+            transform: translateY(-10px);
+        }
+        
+        .hearts {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .heart {
+            position: absolute;
+            opacity: 0;
+            animation: float 6s ease-in infinite;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+            20% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .polaroid {
+            margin: 3rem auto;
+            width: 300px;
+            background: white;
+            padding: 1rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transform: rotate(-2deg);
+            transition: transform 0.3s ease;
+            text-align: center;
+        }
+        
+        .polaroid:hover {
+            transform: rotate(0deg) scale(1.05);
+        }
+        
+        .polaroid img {
+            width: 100%;
+            height: auto;
+            display: block;
+            margin-bottom: 1rem;
+            filter: sepia(0.2);
+            transition: filter 0.3s ease;
+        }
+        
+        .polaroid:hover img {
+            filter: sepia(0);
+        }
+        
+        .upload-box {
+            margin: 2rem 0;
+            text-align: center;
+        }
+        
+        .polaroid p {
+            font-family: 'Great Vibes', cursive;
+            font-size: 1.5rem;
+            color: #333;
+        }
+        
+        .message {
+            max-width: 600px;
+            margin: 2rem auto;
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+        
+        .btn {
+            background: #701f2d;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn.lang-btn {
+            margin-bottom: 1rem;
+        }
+        .btn:hover, .btn.lang-btn:hover {
+            background: #8a2436;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        footer {
+            margin-top: 3rem;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        
+        @media (max-width: 768px) {
+            h1.name {
+                font-size: 4rem;
+            }
+            
+            h1.name::before, h1.name::after {
+                font-size: 2rem;
+                top: 0;
+                transform: none;
+            }
+            
+            .polaroid {
+                width: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="btn lang-btn" id="translateBtn">Bahasa Indonesia</button>
+        <h1 class="subtitle">For Someone Special</h1>
+        <h1 class="name">Sakila</h1>
+        <p class="subtitle">Every moment with you is magical</p>
+        
+        <div class="love-box">
+            <p>"In all the world, there is no heart for me like yours.<br>In all the world, there is no love for you like mine."</p>
+        </div>
+        
+        <div class="polaroid">
+            <img id="uploadedPhoto" src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/29539c71-b38c-4e60-aae3-c8d206f01909.png" alt="Your special photo will appear here" />
+            <p>Our Special Moments</p>
+        </div>
+        
+        <div class="upload-box">
+            <input type="file" id="photoInput" accept="image/*" style="display: none;">
+            <button class="btn" onclick="document.getElementById('photoInput').click()">Upload Our Photo</button>
+        </div>
+        
+        <div class="message">
+            <p>Sakila, every day my love for you grows stronger. You light up my world with your smile and fill my heart with joy. This digital love letter is just a small token of my endless affection for you.</p>
+        </div>
+        
+        <button class="btn" id="loveBtn">Click for more love</button>
+        
+        <footer>
+            Made with ❤️ - For Sakila
+        </footer>
+    </div>
+    
+    <div class="hearts" id="heartsContainer"></div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let isIndonesian = false;
+            const translations = {
+                "For Someone Special": "Untuk Seseorang yang Spesial",
+                "Every moment with you is magical": "Setiap momen bersamamu penuh keajaiban",
+                "In all the world, there is no heart for me like yours.": "Di seluruh dunia, tak ada hati seperti milikmu bagiku.",
+                "In all the world, there is no love for you like mine.": "Di seluruh dunia, tak ada cinta seperti milikku untukmu.",
+                "Our Special Moments": "Momen Spesial Kami",
+                "Upload Our Photo": "Unggah Foto Kita",
+                "Sakila, every day my love for you grows stronger.": "Sakila, setiap hari cintaku padamu semakin kuat.",
+                "You light up my world with your smile": "Kau terangi duniaku dengan senyummu",
+                "Click for more love": "Klik untuk lebih banyak cinta",
+                "Made with ❤️ - For Sakila": "Dibuat dengan ❤️ - Untuk Sakila"
+            };
+
+            document.getElementById('translateBtn').addEventListener('click', function() {
+                isIndonesian = !isIndonesian;
+                this.textContent = isIndonesian ? 'English' : 'Bahasa Indonesia';
+                
+                document.querySelectorAll('.subtitle, .message p, .love-box p, .polaroid p, footer')
+                    .forEach(el => {
+                        if (isIndonesian && translations[el.textContent]) {
+                            el.textContent = translations[el.textContent];
+                        } else if (!isIndonesian) {
+                            Object.entries(translations).forEach(([eng, ind]) => {
+                                if (el.textContent === ind) el.textContent = eng;
+                            });
+                        }
+                    });
+            });
+            // Create floating hearts
+            function createHeart() {
+                const heart = document.createElement('div');
+                heart.innerHTML = '❤️';
+                heart.classList.add('heart');
+                
+                const size = Math.random() * 30 + 10;
+                const left = Math.random() * 100;
+                const duration = Math.random() * 3 + 3;
+                const delay = Math.random() * 5;
+                
+                heart.style.left = `${left}vw`;
+                heart.style.fontSize = `${size}px`;
+                heart.style.animationDuration = `${duration}s`;
+                heart.style.animationDelay = `${delay}s`;
+                
+                document.getElementById('heartsContainer').appendChild(heart);
+                
+                setTimeout(() => {
+                    heart.remove();
+                }, duration * 1000);
+            }
+            
+            setInterval(createHeart, 300);
+            
+            // Button animation
+            const btn = document.getElementById('loveBtn');
+            btn.addEventListener('click', function() {
+                for(let i = 0; i < 30; i++) {
+                    setTimeout(createHeart, i * 100);
+                }
+                
+                // Create a special message
+                const messages = [
+                    "You are my sunshine ❤️",
+                    "I adore you Sakila",
+                    "My heart belongs to you",
+                    "You're my everything",
+                    "Love you more than words can say"
+                ];
+                
+                const randomMessage = getRandomMessage();
+                
+                const messageBox = document.querySelector('.love-box');
+                messageBox.innerHTML = `<p>"${randomMessage}"</p>`;
+                
+                // Animation effect
+                messageBox.style.animation = 'none';
+                messageBox.offsetHeight; // Trigger reflow
+                messageBox.style.animation = 'pulse 0.5s';
+            });
+            
+            // Rotate through quotes
+            const quotes = [
+                "Your love is all I need to make it through each day",
+                "In your arms is where I belong",
+                "Your smile is my favorite thing in the world",
+                "Every love story is beautiful, but ours is my favorite",
+                "You're my today and all of my tomorrows"
+            ];
+            
+            let quoteIndex = 0;
+            setInterval(() => {
+                const quoteBox = document.querySelector('.message p');
+                quoteBox.style.opacity = 0;
+                
+                setTimeout(() => {
+                    quoteBox.textContent = quotes[quoteIndex];
+                    quoteBox.style.opacity = 1;
+                    quoteIndex = (quoteIndex + 1) % quotes.length;
+                }, 500);
+            }, 5000);
+        // Photo upload functionality
+            const photoInput = document.getElementById('photoInput');
+            photoInput.addEventListener('change', function(e) {
+                if (e.target.files && e.target.files[0]) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(event) {
+                        const img = document.getElementById('uploadedPhoto');
+                        img.src = event.target.result;
+                        img.alt = "Our special memory";
+                        
+                        // Optional: Change polaroid text when new photo is uploaded
+                        document.querySelector('.polaroid p').textContent = 'Our Special Moment';
+                    };
+                    
+                    reader.readAsDataURL(e.target.files[0]);
+                    
+                    // Show heart animation when photo is uploaded
+                    for(let i = 0; i < 20; i++) {
+                        setTimeout(createHeart, i * 100);
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Love For Sakila</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            color: #5a1b24;
+        }
+        
+        .container {
+            text-align: center;
+            position: relative;
+            max-width: 1200px;
+            padding: 2rem;
+            margin: 0 auto;
+        }
+        
+        h1.name {
+            font-family: 'Great Vibes', cursive;
+            font-size: 6rem;
+            color: #701f2d;
+            margin: 1rem 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            position: relative;
+            display: inline-block;
+        }
+        
+        h1.name::before, h1.name::after {
+            content: '❤️';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 3rem;
+            animation: pulse 1.5s infinite alternate;
+        }
+        
+        h1.name::before {
+            left: -2.5rem;
+        }
+        
+        h1.name::after {
+            right: -2.5rem;
+        }
+        
+        @keyframes pulse {
+            from { transform: translateY(-50%) scale(1); }
+            to { transform: translateY(-50%) scale(1.2); }
+        }
+        
+        .subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+        
+        .love-box {
+            background-color: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin: 2rem 0;
+            transition: transform 0.3s ease;
+        }
+        
+        .love-box:hover {
+            transform: translateY(-10px);
+        }
+        
+        .hearts {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .heart {
+            position: absolute;
+            opacity: 0;
+            animation: float 6s ease-in infinite;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+            20% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .polaroid {
+            margin: 3rem auto;
+            width: 300px;
+            background: white;
+            padding: 1rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transform: rotate(-2deg);
+            transition: transform 0.3s ease;
+            text-align: center;
+        }
+        
+        .polaroid:hover {
+            transform: rotate(0deg) scale(1.05);
+        }
+        
+        .polaroid img {
+            width: 100%;
+            height: auto;
+            display: block;
+            margin-bottom: 1rem;
+            filter: sepia(0.2);
+            transition: filter 0.3s ease;
+        }
+        
+        .polaroid:hover img {
+            filter: sepia(0);
+        }
+        
+        .upload-box {
+            margin: 2rem 0;
+            text-align: center;
+        }
+        
+        .polaroid p {
+            font-family: 'Great Vibes', cursive;
+            font-size: 1.5rem;
+            color: #333;
+        }
+        
+        .message {
+            max-width: 600px;
+            margin: 2rem auto;
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+        
+        .btn {
+            background: #701f2d;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn.lang-btn {
+            margin-bottom: 1rem;
+        }
+        .btn:hover, .btn.lang-btn:hover {
+            background: #8a2436;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        footer {
+            margin-top: 3rem;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        
+        @media (max-width: 768px) {
+            h1.name {
+                font-size: 4rem;
+            }
+            
+            h1.name::before, h1.name::after {
+                font-size: 2rem;
+                top: 0;
+                transform: none;
+            }
+            
+            .polaroid {
+                width: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="btn lang-btn" id="translateBtn">Bahasa Indonesia</button>
+        <h1 class="subtitle">For Someone Special</h1>
+        <h1 class="name">Sakila</h1>
+        <p class="subtitle">Every moment with you is magical</p>
+        
+        <div class="love-box">
+            <p>"In all the world, there is no heart for me like yours.<br>In all the world, there is no love for you like mine."</p>
+        </div>
+        
+        <div class="polaroid">
+            <img id="uploadedPhoto" src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/29539c71-b38c-4e60-aae3-c8d206f01909.png" alt="Your special photo will appear here" />
+            <p>Our Special Moments</p>
+        </div>
+        
+        <div class="upload-box">
+            <input type="file" id="photoInput" accept="image/*" style="display: none;">
+            <button class="btn" onclick="document.getElementById('photoInput').click()">Upload Our Photo</button>
+        </div>
+        
+        <div class="message">
+            <p>Sakila, every day my love for you grows stronger. You light up my world with your smile and fill my heart with joy. This digital love letter is just a small token of my endless affection for you.</p>
+        </div>
+        
+        <button class="btn" id="loveBtn">Click for more love</button>
+        
+        <footer>
+            Made with ❤️ - For Sakila
+        </footer>
+    </div>
+    
+    <div class="hearts" id="heartsContainer"></div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let isIndonesian = false;
+            const translations = {
+                "For Someone Special": "Untuk Seseorang yang Spesial",
+                "Every moment with you is magical": "Setiap momen bersamamu penuh keajaiban",
+                "In all the world, there is no heart for me like yours.": "Di seluruh dunia, tak ada hati seperti milikmu bagiku.",
+                "In all the world, there is no love for you like mine.": "Di seluruh dunia, tak ada cinta seperti milikku untukmu.",
+                "Our Special Moments": "Momen Spesial Kami",
+                "Upload Our Photo": "Unggah Foto Kita",
+                "Sakila, every day my love for you grows stronger.": "Sakila, setiap hari cintaku padamu semakin kuat.",
+                "You light up my world with your smile": "Kau terangi duniaku dengan senyummu",
+                "Click for more love": "Klik untuk lebih banyak cinta",
+                "Made with ❤️ - For Sakila": "Dibuat dengan ❤️ - Untuk Sakila"
+            };
+
+            document.getElementById('translateBtn').addEventListener('click', function() {
+                isIndonesian = !isIndonesian;
+                this.textContent = isIndonesian ? 'English' : 'Bahasa Indonesia';
+                
+                document.querySelectorAll('.subtitle, .message p, .love-box p, .polaroid p, footer')
+                    .forEach(el => {
+                        if (isIndonesian && translations[el.textContent]) {
+                            el.textContent = translations[el.textContent];
+                        } else if (!isIndonesian) {
+                            Object.entries(translations).forEach(([eng, ind]) => {
+                                if (el.textContent === ind) el.textContent = eng;
+                            });
+                        }
+                    });
+            });
+            // Create floating hearts
+            function createHeart() {
+                const heart = document.createElement('div');
+                heart.innerHTML = '❤️';
+                heart.classList.add('heart');
+                
+                const size = Math.random() * 30 + 10;
+                const left = Math.random() * 100;
+                const duration = Math.random() * 3 + 3;
+                const delay = Math.random() * 5;
+                
+                heart.style.left = `${left}vw`;
+                heart.style.fontSize = `${size}px`;
+                heart.style.animationDuration = `${duration}s`;
+                heart.style.animationDelay = `${delay}s`;
+                
+                document.getElementById('heartsContainer').appendChild(heart);
+                
+                setTimeout(() => {
+                    heart.remove();
+                }, duration * 1000);
+            }
+            
+            setInterval(createHeart, 300);
+            
+            // Button animation
+            const btn = document.getElementById('loveBtn');
+            btn.addEventListener('click', function() {
+                for(let i = 0; i < 30; i++) {
+                    setTimeout(createHeart, i * 100);
+                }
+                
+                // Create a special message
+                const messages = [
+                    "You are my sunshine ❤️",
+                    "I adore you Sakila",
+                    "My heart belongs to you",
+                    "You're my everything",
+                    "Love you more than words can say"
+                ];
+                
+                const randomMessage = getRandomMessage();
+                
+                const messageBox = document.querySelector('.love-box');
+                messageBox.innerHTML = `<p>"${randomMessage}"</p>`;
+                
+                // Animation effect
+                messageBox.style.animation = 'none';
+                messageBox.offsetHeight; // Trigger reflow
+                messageBox.style.animation = 'pulse 0.5s';
+            });
+            
+            // Rotate through quotes
+            const quotes = [
+                "Your love is all I need to make it through each day",
+                "In your arms is where I belong",
+                "Your smile is my favorite thing in the world",
+                "Every love story is beautiful, but ours is my favorite",
+                "You're my today and all of my tomorrows"
+            ];
+            
+            let quoteIndex = 0;
+            setInterval(() => {
+                const quoteBox = document.querySelector('.message p');
+                quoteBox.style.opacity = 0;
+                
+                setTimeout(() => {
+                    quoteBox.textContent = quotes[quoteIndex];
+                    quoteBox.style.opacity = 1;
+                    quoteIndex = (quoteIndex + 1) % quotes.length;
+                }, 500);
+            }, 5000);
+        // Photo upload functionality
+            const photoInput = document.getElementById('photoInput');
+            photoInput.addEventListener('change', function(e) {
+                if (e.target.files && e.target.files[0]) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(event) {
+                        const img = document.getElementById('uploadedPhoto');
+                        img.src = event.target.result;
+                        img.alt = "Our special memory";
+                        
+                        // Optional: Change polaroid text when new photo is uploaded
+                        document.querySelector('.polaroid p').textContent = 'Our Special Moment';
+                    };
+                    
+                    reader.readAsDataURL(e.target.files[0]);
+                    
+                    // Show heart animation when photo is uploaded
+                    for(let i = 0; i < 20; i++) {
+                        setTimeout(createHeart, i * 100);
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
